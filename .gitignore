@@ -1,0 +1,5 @@
+*.o
+*.so
+graphics*
+*.h
+.vscode
