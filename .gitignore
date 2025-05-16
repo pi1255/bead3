@@ -3,3 +3,9 @@
 graphics*
 *.h
 .vscode
+CMakeFiles*
+*.cmake
+CMakeCache.txt
+*.a
+bead3
+Makefile

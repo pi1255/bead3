@@ -15,7 +15,7 @@ protected:
     std::vector<Widget*> widgets;
     genv::canvas background;
 public: 
-    App(int x, int y, genv::color bgcolor = GREEN);
+    App(int x, int y, genv::color bgcolor);
     ~App();
     void registre_widget(Widget* w);
     void event_loop();

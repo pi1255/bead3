@@ -1,5 +1,6 @@
 #include "app.hpp"
 #include "Widgets/widget.hpp"
+#include <iostream>
 using namespace genv;
 using std::vector;
 
@@ -18,9 +19,11 @@ App::~App() {
 void App::event_loop() {
     event ev;
     int focus = -1;
+    gout << stamp(background, 0, 0);
     for (auto i: widgets) i->draw();
     gout << refresh;
     while (gin >> ev && ev.keycode != key_escape) {
+        std::cout << ev.type << std::endl;
         gout << stamp(background, 0, 0);
         if (ev.button == btn_left) {
             for (int i = 0; i < widgets.size(); i++) {

@@ -23,7 +23,7 @@ add_library( graphics graphics.cpp )
 #add_library(widgets widgets/widgets.cpp widgets/numberwidget.cpp widgets/dropdownwidget.cpp)
 
 
-add_library(APP app.cpp Widgets/widget.cpp Widgets/button.cpp)
+add_library(APP app.cpp Widgets/widget.cpp Widgets/button.cpp Widgets/card.cpp)
 link_libraries(APP graphics)
 
 add_executable(bead3 main.cpp) 
