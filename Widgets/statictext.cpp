@@ -5,6 +5,7 @@ using namespace genv;
 using namespace std;
 
 void StaticText::draw() {
+    if(!show) return;
     int fasc = (gout.cascent()+gout.cdescent())/2;
     stringstream ss;
     ss << _txt;

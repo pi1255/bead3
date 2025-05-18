@@ -4,10 +4,14 @@
 using namespace std;
 using namespace genv;
 
-Card::Card(App* parent, char col, string num, int x, int y): Widget(parent, x, y, 0, 0), cardcolor(col), num(num) {
+Card::Card(App* parent, char col, char num, int x, int y): Widget(parent, x, y, 0, 0), cardcolor(col), num(num) {
     //card.transparent(true);
+    show = 0;
     stringstream ss;
-    ss << "cards/" << cardcolor << num << ".bmp.kep";
+    std::stringstream s;
+    if (num == 't') s << "10";
+    else s << num;
+    ss << "cards/" << cardcolor << s.str() << ".bmp.kep";
     ifstream f(ss.str());
     if (!f.is_open()) {
         stringstream ss;

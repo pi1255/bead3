@@ -6,6 +6,7 @@ using namespace std;
 Button::Button(App* parent, int x, int y, int sx, int sy, std::string text, std::function<void()>f, bool stay): Widget(parent, x, y, sx, sy), txt(text), f(f), stay(stay) {};
 
 void Button::draw() {
+    if (!show) return;
     gout << move_to(x, y) << (pressed? ROYAL_BLUE : LIGHT_BLUE) << box(sx, sy);
     gout << BLACK;
     int casc = (gout.cascent()+gout.cdescent())/2;

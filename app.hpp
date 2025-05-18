@@ -14,6 +14,7 @@ protected:
     genv::color bgcolor;
     std::vector<Widget*> widgets;
     genv::canvas background;
+    bool quit = false;
 public: 
     App(int x, int y, genv::color bgcolor);
     ~App();

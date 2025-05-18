@@ -22,7 +22,7 @@ void App::event_loop() {
     gout << stamp(background, 0, 0);
     for (auto i: widgets) i->draw();
     gout << refresh;
-    while (gin >> ev && ev.keycode != key_escape) {
+    while (gin >> ev && ev.keycode != key_escape && !quit) {
         gout << stamp(background, 0, 0);
         if (ev.button == btn_left) {
             for (int i = 0; i < widgets.size(); i++) {
