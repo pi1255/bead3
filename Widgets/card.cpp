@@ -4,7 +4,7 @@
 using namespace std;
 using namespace genv;
 
-Card::Card(App* parent, char col, char num, int x, int y): Widget(parent, x, y, 0, 0), cardcolor(col), num(num) {
+Card::Card(App* parent, char col, string num, int x, int y): Widget(parent, x, y, 0, 0), cardcolor(col), num(num) {
     card.open(parent->X(), parent->Y());
     card.transparent(true);
     stringstream ss;
@@ -12,7 +12,7 @@ Card::Card(App* parent, char col, char num, int x, int y): Widget(parent, x, y, 
     ifstream f(ss.str());
     if (!f.is_open()) {
         stringstream ss;
-        ss << "I/O error at line " << __LINE__;
+        ss << "I/O error at line " << __LINE__  << "(" << cardcolor << "/" << num << ")";
         gout.message(ss.str());
         exit(1);
     }
@@ -30,7 +30,7 @@ Card::Card(App* parent, char col, char num, int x, int y): Widget(parent, x, y, 
 }
 
 void Card::draw()  {
-    gout << stamp(card, x, y);
+    if (show) gout << stamp(card, x, y);
 }
 
 void Card::handle(event ev) {}

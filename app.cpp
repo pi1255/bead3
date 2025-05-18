@@ -13,7 +13,7 @@ App::App(int x, int y, color bgcolor = GREEN): SCREEN_X(x), SCREEN_Y(y), bgcolor
 }
 
 App::~App() {
-    for (auto i: widgets) delete i;
+    //for (auto i: widgets) delete i;
 }
 
 void App::event_loop() {
