@@ -9,3 +9,4 @@ CMakeCache.txt
 *.a
 bead3
 Makefile
+test.cpp

@@ -5,8 +5,7 @@ using namespace std;
 using namespace genv;
 
 Card::Card(App* parent, char col, string num, int x, int y): Widget(parent, x, y, 0, 0), cardcolor(col), num(num) {
-    card.open(parent->X(), parent->Y());
-    card.transparent(true);
+    //card.transparent(true);
     stringstream ss;
     ss << "cards/" << cardcolor << num << ".bmp.kep";
     ifstream f(ss.str());
@@ -17,11 +16,12 @@ Card::Card(App* parent, char col, string num, int x, int y): Widget(parent, x, y
         exit(1);
     }
     f >> sizex >> sizey;
-    for (int i = 0; i < sizex; i++) {
-        for (int j = 0; j < sizey; j++) {
+    card.open(sizex, sizey);
+    for (int i = 0; i < sizey; i++) {
+        for (int j = 0; j < sizex; j++) {
             int r, g, b;
             f >> r>>g>>b;
-            card << move_to(i, j) << color(r, g, b) << dot;
+            card << move_to(j, i) << color(r, g, b) << dot;
         }
     }
     f.close();

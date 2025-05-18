@@ -7,7 +7,7 @@ using std::vector;
 App::App(int x, int y, color bgcolor = GREEN): SCREEN_X(x), SCREEN_Y(y), bgcolor(bgcolor) {
     gout.open(SCREEN_X, SCREEN_Y);
     background.open(SCREEN_X, SCREEN_Y);
-    background << move_to(SCREEN_X, SCREEN_Y) << bgcolor << box(SCREEN_X, SCREEN_Y);
+    background << move_to(0, 0) << bgcolor << box(SCREEN_X, SCREEN_Y);
     gout << stamp(background, 0,0);
     gout << refresh;
 }
@@ -23,7 +23,6 @@ void App::event_loop() {
     for (auto i: widgets) i->draw();
     gout << refresh;
     while (gin >> ev && ev.keycode != key_escape) {
-        std::cout << ev.type << std::endl;
         gout << stamp(background, 0, 0);
         if (ev.button == btn_left) {
             for (int i = 0; i < widgets.size(); i++) {

@@ -17,6 +17,7 @@ void Button::draw() {
 }
 
 void Button::handle(event ev) {
+    if (ev.button != btn_left || !is_selected(ev.pos_x, ev.pos_y)) return;
     if (!pressed) {
         f();
         pressed = true;
