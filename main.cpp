@@ -11,6 +11,12 @@
 #include <map>
 #include <set>
 
+template<typename T1, typename T2>
+std::ostream& operator<<(std::ostream&out, std::map<T1, T2> &t) {
+    for(auto i: t) out << i.first << ":" << i.second << std::endl;
+    return out;
+}
+
 enum order{
     nothing = 0,
     pair1, pair2,
@@ -22,9 +28,13 @@ enum order{
 
 bool isstraight(std::vector<int>&s) {
     int straight = 1;
-    if (s.size()< 5)
-    for (int i = 1; i < s.size(); i++) {
-        if (s[i-1]+1 == s[i]) {
+    std::set<int> unique;
+    for (auto i : s) unique.insert(i);
+    std::vector<int> v;
+    for(auto i: unique) v.push_back(i);
+    if (v.size() > 5)
+    for (int i = 1; i < v.size(); i++) {
+        if (v[i-1]+1 == v[i]) {
             straight++;
             if (straight == 5) return 1;
         } else straight = 1;
@@ -33,86 +43,114 @@ bool isstraight(std::vector<int>&s) {
 }
 
 int get_multiplier(std::vector<Card*>& cards) {
-    unsigned multiplier = 0;
     std::map<order, bool> found;
-    std::vector<cardVal> v;
-    for (auto i: cards) v.push_back(i->getVal());
-    std::vector<int> s;
-    for (auto i: v) {
-        if ('2' <= i.num && i.num <= '9') s.push_back(i.num-'0');
+    std::map<char, int> suit_count;
+    std::map<int, int> value_count;
+    std::vector<int> values;
+
+    for (auto card : cards) {
+        cardVal val = card->getVal();
+        int num;
+
+        if ('2' <= val.num && val.num <= '9') num = val.num - '0';
         else {
-            switch (i.num) {
-                case 't':
-                    s.push_back(10);
+            switch (val.num) {
+                case 't': num = 10; break;
+                case 'j': num = 11; break;
+                case 'q': num = 12; break;
+                case 'k': num = 13; break;
+                case 'a': num = 14; values.push_back(1); break;
+                default: num = 0; break;
+            }
+        }
+
+        values.push_back(num);
+        suit_count[val.cardcolor]++;
+        value_count[num]++;
+    }
+
+    found[flush] = false;
+    for (auto suit : suit_count) {
+        if (suit.second >= 5) {
+            found[flush] = true;
+            break;
+        }
+    }
+
+    found[fourof] = false;
+    int four_val = -1;
+    for (auto val : value_count) {
+        if (val.second >= 4) {
+            found[fourof] = true;
+            four_val = val.first;
+            break;
+        }
+    }
+
+    found[threeof] = false;
+    int three_val = -1;
+    for (auto val : value_count) {
+        if (val.second >= 3 && val.first != four_val) {
+            found[threeof] = true;
+            three_val = val.first;
+        }
+    }
+
+    int pair_count = 0;
+    for (auto val : value_count) {
+        if (val.second >= 2 && val.first != four_val && val.first != three_val) {
+            pair_count++;
+        }
+    }
+
+    found[pair1] = pair_count >= 1;
+    found[pair2] = pair_count >= 2;
+
+    found[full] = false;
+    int full_pair_val = -1;
+    for (auto val : value_count) {
+        if (val.second >= 3) {
+            if (three_val == -1 || val.first > three_val) three_val = val.first;
+        }
+    }
+    for (auto val : value_count) {
+        if (val.first != three_val && val.second >= 2) {
+            full_pair_val = val.first;
+            break;
+        }
+    }
+    found[full] = (three_val != -1 && full_pair_val != -1);
+
+    std::sort(values.begin(), values.end());
+    values.erase(std::unique(values.begin(), values.end()), values.end());
+
+    found[straight] = false;
+    if (values.size() >= 5) {
+        int cons = 1;
+        for (size_t i = 1; i < values.size(); ++i) {
+            if (values[i] == values[i - 1] + 1) {
+                cons++;
+                if (cons >= 5) {
+                    found[straight] = true;
                     break;
-                case 'j':
-                    s.push_back(11);
-                    break;
-                case 'q':
-                    s.push_back(12);
-                    break;
-                case 'k':
-                    s.push_back(13);
-                case 'a':
-                    s.push_back(14);
-                    s.push_back(1);
-                    break;
+                }
+            } else {
+                cons = 1;
             }
         }
     }
-    std::sort(s.begin(), s.end());
-    std::map<char, int> m;
-    for(auto i: v) {
-        try {m.at(i.cardcolor)++;}
-        catch (std::out_of_range &e) { m[i.cardcolor] = 1;}
-    }
-    found[flush] = 0;
-    for (auto i: m) {
-        if (i.second >= 5) found[flush] = 1;
-    }
-    found[fourof] = 0;
-    int poker= 0, three =0;
-    for (int i = 3; i < s.size(); i++) {
-        if (s[i] == s[i-1] && s[i]== s[i-2] && s[i-3]== s[i] && s[i]!= 1) {
-            found[fourof] = 1;
-            poker = s[1];
-        }
-    }
-    found[threeof] = 0;
-    for (int i = 2; i < s.size(); i++) {
-        if(s[i-1] == s[i] && s[i] == s[i-2] && s[i] != 1 && s[i] == poker) {
-            found[threeof] = 1;
-            three = s[i];
-        }
-    }
-    found[pair1] = 0;
-    found[pair2] = 0;
-    for (int i = 1; i < s.size(); i++) {
-        if(s[i-1] == s[i] && s[i] != 1 && s[i] != three && s[i] != poker) {
-            if (found[pair1] == 1) {found[pair2] = 1;}
-            else found[pair1] = 1;
-        }
-    }
-    found[full] = found[pair1] && found[threeof];
-    found[order::straight] = isstraight(s);
-    
-    for (auto i: m) {
-        if (i.second >= 5) {
-            found[flush] = 1;
-        }
-    }
-    found[straight_flush]= found[straight] && found[flush];
-    found[nothing]= 1;
-    std::vector<int> w;
-    for (auto i : found) {
-        if (i.second) w.push_back(i.first);
-    }
-    std::sort(w.begin(), w.end());
-    multiplier = w.at(w.size()-1);
+    found[straight_flush] = found[straight] && found[flush];
 
-    
-    return multiplier;
+    found[nothing] = true;
 
+    int max_rank = nothing;
+    for (auto f : found) {
+        if (f.second && f.first > max_rank) {
+            max_rank = f.first;
+        }
+    }
+    std::cout << found;
+    return max_rank;
 }
 
 class MyApp: public App {
@@ -263,14 +301,44 @@ public:
         for (auto &i: global) tmp.push_back(i);
         int multiplier = get_multiplier(tmp);
         bal += multiplier*pot;
+        std::string s;
+        switch (multiplier) {
+            case nothing:
+                s= "nothing.";
+                break;
+            case pair1:
+                s ="1 pair.";
+                break;
+            case pair2:
+                s="2 pair.";
+                break;
+            case threeof:
+                s="three of kind.";
+                break;
+            case flush:
+                s="flush.";
+                break;
+            case straight:
+                s = "straight.";
+            case full:
+                s = "full house.";
+                break;
+            case fourof:
+                s = "four of kind.";
+                break;
+            case straight_flush:
+                s = "straight flush.";
+            default:
+                break;
+        }
         std::stringstream ss;
-        if (multiplier*pot) ss << "You won " << multiplier*pot << "$" << std::endl
+        if (multiplier*pot) ss << "You won "<< multiplier*pot << "$(You have a " << s << ")" << std::endl
             << "Should I deal another hand?";
         else ss << "You lost " << pot << "$" << std::endl
             << "Should I deal another hand?";
         idx = 0;
         flopped = 0;
-        for (auto i: cards) i->hide();
+        //for (auto i: cards) i->hide();
         players.clear();
         global.clear();
         end = new StaticText(this, 500, 300, SCREEN_X-500, 200, ss.str());
@@ -279,7 +347,9 @@ public:
     };
 };
 
-
+/**
+ * @param argv[1] can set the amount of balance
+ */
 int main(int argc, const char* argv[]) {
     int setbal = 0;
     if (argc > 1) {
